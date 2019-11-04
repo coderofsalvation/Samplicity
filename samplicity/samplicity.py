@@ -224,8 +224,6 @@ class SFZ_instrument:
                 region['delta_sample'] = tempdir + str(random()) + '.dat'
                 region['sample_length'] = len(region['sample_data']) * region['channels']
                 region['sample_data'].T.flatten().tofile(region['delta_sample'], format='f')
-                
-                print("{} = {}".format(region['delta_sample'], len(region['sample_data'])))
                 region['sample_data'] = ''
                 
                 del region['sample_data']
