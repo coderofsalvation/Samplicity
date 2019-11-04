@@ -16,10 +16,10 @@ import time
 import math
 import shutil
 import numpy as np
+from random import random
 from scikits.audiolab import Sndfile, play
 
 from common import wrap, pad_name, path_insensitive
-
 VERSION = 'Samplicity v' + __version__
 
 OPTIONS = {}
@@ -66,8 +66,8 @@ class SFZ_region(dict):
         channels = sample.channels
         encoding = sample.encoding
         frames_count = sample.nframes
-
         frames = sample.read_frames(frames_count, dtype=np.float32)
+        
         sample.close()
         del sample
 
@@ -221,10 +221,13 @@ class SFZ_instrument:
         for i, region in enumerate(self.regions):
             if self.is_region_used(i):
                 region.load_audio()
-                region['delta_sample'] = tempdir + str(time.clock()) + '.dat'
+                region['delta_sample'] = tempdir + str(random()) + '.dat'
                 region['sample_length'] = len(region['sample_data']) * region['channels']
                 region['sample_data'].T.flatten().tofile(region['delta_sample'], format='f')
+                
+                print("{} = {}".format(region['delta_sample'], len(region['sample_data'])))
                 region['sample_data'] = ''
+                
                 del region['sample_data']
                 used_regions.append(region)
             else:
