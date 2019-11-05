@@ -76,7 +76,7 @@ class SFZ_region(dict):
             sample_type = 0
         elif channels == 2:
             text_type = 'stereo'
-            sample_type = 0b01100100
+            sample_type = 0b1100100
         else:
             text_type = '{0}-channels'.format(channels)
 
@@ -224,6 +224,8 @@ class SFZ_instrument:
                 region['delta_sample'] = tempdir + str(random()) + '.dat'
                 region['sample_length'] = len(region['sample_data']) * region['channels']
                 region['sample_data'].T.flatten().tofile(region['delta_sample'], format='f')
+                
+                print("{} = {}".format(region['delta_sample'], len(region['sample_data'])))
                 region['sample_data'] = ''
                 
                 del region['sample_data']
@@ -358,7 +360,11 @@ class SFZ_instrument:
         for region in self.regions:
             self.output_file.write(struct.pack(
                 'i', region['sample_bittype'] * region['sample_length']))  # sample length
-            self.output_file.write(struct.pack('2i', 0, 0))  # sample loop start and end
+            loopstart = region['sample_bittype'] * int(region['loop_start']) if 'loop_start' in region else 0
+            loopend   = region['sample_bittype'] * int(region['loop_end'])   if 'loop_end'   in region else 0
+            loopend  -= loopstart # loop-length
+            
+            self.output_file.write(struct.pack('2i', loopstart*2, loopend*2))  # sample loop start and end
             # volume
             volume = 255
             if 'volume' in region:
@@ -369,6 +375,8 @@ class SFZ_instrument:
             self.output_file.write(struct.pack('B', volume))
 
             self.output_file.write(struct.pack('b', int(region['tune'])))  # finetune (signed!)
+            if loopstart:
+                region['sample_type'] = 0b1100101
             self.output_file.write(struct.pack('b', region['sample_type']))  # sample type
 
             #panning (unsigned!)
