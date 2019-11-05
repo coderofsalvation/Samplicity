@@ -76,7 +76,7 @@ class SFZ_region(dict):
             sample_type = 0
         elif channels == 2:
             text_type = 'stereo'
-            sample_type = 0b1100100
+            sample_type = 0b01100100
         else:
             text_type = '{0}-channels'.format(channels)
 
@@ -225,7 +225,6 @@ class SFZ_instrument:
                 region['sample_length'] = len(region['sample_data']) * region['channels']
                 region['sample_data'].T.flatten().tofile(region['delta_sample'], format='f')
                 
-                print("{} = {}".format(region['delta_sample'], len(region['sample_data'])))
                 region['sample_data'] = ''
                 
                 del region['sample_data']
